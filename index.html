@@ -1,109 +1,119 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiểm tra Từ Vựng Anh - Việt</title>
+    <title>Vocabulary Quiz App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background-color: #f4f4f4;
         }
-        .quiz-box {
+        .container {
             background: white;
-            padding: 25px;
-            border-radius: 14px;
+            padding: 20px;
+            border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 350px;
             text-align: center;
         }
-        .quiz-box h3 {
-            margin-bottom: 20px;
+        .word-display {
+            font-size: 20px;
+            margin-bottom: 15px;
         }
-        .quiz-box input {
-            width: 100%;
+        input {
             padding: 10px;
-            margin: 10px 0;
+            width: 80%;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: 5px;
         }
-        .quiz-box button {
-            background: #2a7ae2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
+        button {
+            padding: 10px 15px;
             margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
         }
-        .quiz-box button:hover {
-            background: #155db2;
-        }
-        .result {
-            margin-top: 15px;
-            font-size: 16px;
-            min-height: 24px;
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-<div class="quiz-box">
-    <h3>Nhập Từ Tiếng Anh</h3>
-    <div id="question" style="font-size:18px; font-weight:500; margin-bottom:10px;">Bắt đầu!</div>
-    <input type="text" id="answerInput" placeholder="Nhập từ tiếng Anh...">
-    <div>
-        <button onclick="checkAnswer()">Kiểm Tra</button>
-        <button onclick="skipWord()">Bỏ Qua</button>
-    </div>
-    <div class="result" id="result"></div>
+<div class="container">
+    <div class="word-display" id="vietnameseWord">Nhấn 'Tiếp tục' để bắt đầu!</div>
+    <input type="text" id="userInput" placeholder="Nhập từ tiếng Anh ở đây">
+    <br>
+    <button onclick="checkAnswer()">Kiểm tra</button>
+    <button onclick="nextWord()">Tiếp tục</button>
+    <button onclick="giveHint()">Gợi ý</button>
 </div>
 
 <script>
-    const dictionary = {
-        "abide by": "tuân theo",
-        "agreement": "thỏa thuận, hợp đồng",
-        "assurance": "sự đảm bảo",
-        "cancellation": "sự hủy bỏ",
-        "determine": "xác định, quyết định",
-        "engage": "tham gia, cam kết",
-        "establish": "thành lập",
-        "obligate": "bắt buộc, ép buộc",
-        "party": "bên (trong hợp đồng); đảng phái",
-        "provision": "điều khoản (trong hợp đồng)"
-    };
+    const vocabulary = [
+        { en: "abide by", vn: "tuân theo" },
+        { en: "agreement", vn: "thỏa thuận, hợp đồng" },
+        { en: "assurance", vn: "sự đảm bảo" },
+        { en: "cancellation", vn: "sự hủy bỏ" },
+        { en: "determine", vn: "xác định, quyết định" },
+        { en: "engage", vn: "tham gia, cam kết" },
+        { en: "establish", vn: "thành lập" },
+        { en: "obligate", vn: "bắt buộc, ép buộc" },
+        { en: "party", vn: "bên (trong hợp đồng); đảng phái" },
+        { en: "provision", vn: "điều khoản (trong hợp đồng)" },
+        { en: "resolve", vn: "giải quyết" },
+        { en: "specific", vn: "cụ thể" },
+        { en: "attract", vn: "thu hút" },
+        { en: "compare", vn: "so sánh" },
+        { en: "competition", vn: "sự cạnh tranh" },
+        { en: "consume", vn: "tiêu dùng, tiêu thụ" },
+        { en: "convince", vn: "thuyết phục" },
+        { en: "currently", vn: "hiện tại" },
+        { en: "fad", vn: "mốt nhất thời" },
+        { en: "inspiration", vn: "nguồn cảm hứng" },
+        { en: "market", vn: "tiếp thị, quảng bá" },
+        { en: "persuasion", vn: "sự thuyết phục" },
+        { en: "productive", vn: "năng suất, hiệu quả" },
+        { en: "satisfaction", vn: "sự hài lòng" }
+    ];
 
-    let currentWord = "";
+    let usedWords = [];
+    let currentWord = null;
 
-    function randomWord() {
-        const keys = Object.keys(dictionary);
-        const index = Math.floor(Math.random() * keys.length);
-        currentWord = keys[index];
-        document.getElementById('question').textContent = dictionary[currentWord];
-        document.getElementById('answerInput').value = "";
-        document.getElementById('result').textContent = "";
+    function nextWord() {
+        if (usedWords.length >= vocabulary.length - 5) {
+            usedWords = [];
+        }
+        let available = vocabulary.filter(word => !usedWords.includes(word.vn));
+        currentWord = available[Math.floor(Math.random() * available.length)];
+        usedWords.push(currentWord.vn);
+
+        document.getElementById("vietnameseWord").innerText = currentWord.vn;
+        document.getElementById("userInput").value = "";
     }
 
     function checkAnswer() {
-        const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
-        if (userAnswer === currentWord.toLowerCase()) {
-            document.getElementById('result').textContent = "✅ Chính xác!";
-            setTimeout(randomWord, 1000);
+        const userAnswer = document.getElementById("userInput").value.trim().toLowerCase();
+        if (!currentWord) return alert("Hãy nhấn 'Tiếp tục' để bắt đầu!");
+
+        if (userAnswer === currentWord.en.toLowerCase()) {
+            alert("Chính xác!");
+            nextWord();
         } else {
-            document.getElementById('result').textContent = "❌ Sai rồi, thử lại nhé!";
+            alert("Chưa đúng, thử lại!");
         }
     }
 
-    function skipWord() {
-        randomWord();
+    function giveHint() {
+        if (!currentWord) return alert("Bạn cần nhấn 'Tiếp tục' trước!");
+        document.getElementById("userInput").value = currentWord.en.charAt(0);
     }
-
-    randomWord();
 </script>
 </body>
 </html>
