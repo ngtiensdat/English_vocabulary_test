@@ -39,20 +39,30 @@
             background-color: #007BFF;
             color: white;
             cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="word-display" id="vietnameseWord">Nhấn 'Tiếp tục' để bắt đầu!</div>
+    <div class="word-display" id="vietnameseWord">Nhấn 'Bỏ qua' để bắt đầu!</div>
     <input type="text" id="userInput" placeholder="Nhập từ tiếng Anh ở đây">
     <br>
     <button onclick="checkAnswer()">Kiểm tra</button>
-    <button onclick="nextWord()">Tiếp tục</button>
+    <button onclick="nextWord()">Bỏ qua</button>
     <button onclick="giveHint()">Gợi ý</button>
+    <div class="feedback" id="feedback"></div>
 </div>
 
 <script>
@@ -96,22 +106,28 @@
 
         document.getElementById("vietnameseWord").innerText = currentWord.vn;
         document.getElementById("userInput").value = "";
+        document.getElementById("feedback").innerText = "";
     }
 
     function checkAnswer() {
         const userAnswer = document.getElementById("userInput").value.trim().toLowerCase();
-        if (!currentWord) return alert("Hãy nhấn 'Tiếp tục' để bắt đầu!");
-
+        if (!currentWord) {
+            document.getElementById("feedback").innerText = "Hãy nhấn 'Bỏ qua' để bắt đầu!";
+            return;
+        }
         if (userAnswer === currentWord.en.toLowerCase()) {
-            alert("Chính xác!");
-            nextWord();
+            document.getElementById("feedback").innerText = "🎉 Chính xác!";
+            setTimeout(nextWord, 1000);
         } else {
-            alert("Chưa đúng, thử lại!");
+            document.getElementById("feedback").innerText = "❌ Chưa đúng, thử lại!";
         }
     }
 
     function giveHint() {
-        if (!currentWord) return alert("Bạn cần nhấn 'Tiếp tục' trước!");
+        if (!currentWord) {
+            document.getElementById("feedback").innerText = "Bạn cần nhấn 'Bỏ qua' trước!";
+            return;
+        }
         document.getElementById("userInput").value = currentWord.en.charAt(0);
     }
 </script>
